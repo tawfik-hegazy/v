@@ -84,15 +84,14 @@
         }
         .polaroid img {
             width: 100%;
-            height: 300px;
+            height: 350px;
             object-fit: cover;
             border: 1px solid #eee;
         }
 
         /* Gentle White & Pink Envelope Styles */
-        /* Gentle White & Pink Envelope Styles */
         .envelope-wrapper {
-            margin-top: 100px auto;
+            margin: 20px auto;
             position: relative;
             width: 300px;
             height: 200px;
@@ -135,9 +134,8 @@
         }
 
         .letter {
-            margin-top: 70px auto;
             position: absolute;
-            bottom: 15px;
+            bottom: 5px;
             left: 10px;
             right: 10px;
             height: 180px;
@@ -152,9 +150,9 @@
             flex-direction: column;
         }
 
-
+        /* Adjusted: Letter moves slightly less high up to stay lower on the screen */
         .envelope-wrapper.open .letter {
-            transform: translateY(-130px);
+            transform: translateY(-90px);
             height: 280px;
         }
 
@@ -293,7 +291,7 @@
         <p id="vibeMsg" class="mt-6 font-romantic text-2xl text-rose-300 opacity-0 transition-opacity">Keep sliding, Joudy...</p>
     </div>
 
-    <!-- Slides 3-4: Memories (Polaroids) -->
+    <!-- Slide 3-4: Memories -->
     <div id="slide-3" class="slide">
         <div class="polaroid" style="--rot: -2deg">
             <img src="./WhatsApp Image 2026-02-14 at 4.31.53 PM.jpeg" alt="Memory 1">
@@ -323,7 +321,7 @@
         </div>
     </div>
 
-    <!-- Slides 6-7: Memories -->
+    <!-- Slide 6-7: Memories -->
     <div id="slide-6" class="slide">
         <div class="polaroid" style="--rot: -1deg">
             <img src="./WhatsApp Image 2026-02-14 at 4.31.23 PM.jpeg" alt="Memory 3">
@@ -334,7 +332,7 @@
     <div id="slide-7" class="slide">
         <div class="polaroid" style="--rot: 2deg">
             <img src="./WhatsApp Image 2026-02-14 at 4.28.46 PM.jpeg" alt="Memory 4">
-            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Just The Two Of Us <br>Forever.</p>
+            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Just The Two Of Us Forever.</p>
         </div>
     </div>
 
@@ -372,14 +370,14 @@
             <div class="flap"></div>
             <div class="letter">
                 <div id="typewriter" class="flex flex-col h-full overflow-hidden">
-                    <!-- Text will be typed here -->
+                    <!-- Text types here -->
                 </div>
             </div>
             <div class="envelope-front">
                 <div class="seal"></div>
             </div>
         </div>
-        <p class="mt-40 text-[10px] text-amber-200/60 uppercase tracking-widest" id="env-hint">Tap the heart seal to open...</p>
+        <p class="mt-20 text-[10px] text-amber-200/60 uppercase tracking-widest" id="env-hint">Tap the heart seal to open...</p>
     </div>
 
     <!-- Slide 11: Finale -->
@@ -413,7 +411,6 @@
         let bloomCount = 0;
         let holdTimer;
         let holdDone = false;
-        let playing = false;
         let envelopeOpened = false;
         let typingStarted = false;
 
@@ -456,7 +453,6 @@
             document.getElementById('slide-0').classList.add('is-playing');
             setTimeout(() => {
                 audio.play();
-                playing = true;
                 nextSlide();
             }, 800);
         });
@@ -487,6 +483,7 @@
                 setTimeout(nextSlide, 2500);
             }, 2000);
         }
+
         function endHold() {
             if(holdDone) return;
             clearTimeout(holdTimer);
@@ -545,22 +542,19 @@
             const hint = document.getElementById('env-hint');
             env.classList.add('open');
             envelopeOpened = true;
-            hint.innerText = "Tap again once you've read our note...";
+            hint.innerText = "Tap again to see our grand finale...";
 
-            // Wait for letter to slide out before starting typewriter (animation is 0.8s)
             setTimeout(startTypewriter, 1000);
         }
 
         function startTypewriter() {
             if (typingStarted) return;
             typingStarted = true;
-            
             const container = document.getElementById('typewriter');
-            
             const content = [
-                { text: "My Love Joudy,", class: "font-romantic text-2xl text-rose-900 leading-tight mb-2" },
-                { text: "You make every day feel like a beautiful symphony. I am so lucky to have you in my life. Every smile, every laugh, and every moment we share is a memory I'll cherish forever. Happy Valentine's Day!", class: "text-[10px] text-gray-700 leading-relaxed font-medium mb-4" },
-                { text: "Forever Yours ❤️", class: "text-[15px] font-romantic text-xl text-rose-800 text-right " }
+                { text: "My Love Joudy,", class: "font-romantic text-2xl text-rose-900 mb-2" },
+                { text: "You make every day feel like a beautiful symphony. I am so lucky to have you in my life. Every smile, every laugh, and every moment we share is a memory I'll cherish forever. Happy Valentine's Day!", class: "text-[15px] text-gray-700 leading-relaxed font-medium mb-4" },
+                { text: "Forever Yours ❤️", class: "text-[15px] font-romantic text-xl text-rose-800 text-right" }
             ];
 
             let lineIndex = 0;
@@ -569,29 +563,24 @@
             function type() {
                 if (lineIndex < content.length) {
                     const line = content[lineIndex];
-                    
-                    // Create element if starting new line
                     if (charIndex === 0) {
                         const el = document.createElement('p');
                         el.className = line.class;
                         el.id = `type-line-${lineIndex}`;
                         container.appendChild(el);
                     }
-
                     const target = document.getElementById(`type-line-${lineIndex}`);
                     target.textContent += line.text[charIndex];
                     charIndex++;
-
                     if (charIndex < line.text.length) {
                         setTimeout(type, 30);
                     } else {
                         charIndex = 0;
                         lineIndex++;
-                        setTimeout(type, 500); // Pause between paragraphs
+                        setTimeout(type, 500);
                     }
                 }
             }
-
             type();
         }
 
@@ -633,7 +622,4 @@
         }
     </script>
 </body>
-
 </html>
-
-
