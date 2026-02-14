@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Valentine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Syne:wght@800&family=Plus+Jakarta+Sans:wght@300;500;800&family=Playfair+Display:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --j-deep-rose: #880d1e;
+            --j-raspberry: #d90429;
+            --j-blush: #ffb3c1;
+            --j-gentle-pink: #ffe5ec;
+            --j-gold: #efb810;
+            --j-soft-cream: #fff5f5;
+        }
+
+        body {
+            background: linear-gradient(180deg, #4c0519 0%, #880d1e 100%);
+            color: #fff1f2;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-romantic { font-family: 'Dancing Script', cursive; }
+        .font-syne { font-family: 'Syne', sans-serif; }
+        .font-lounge { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; }
+
+        /* Slide Transitions */
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            transition: all 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(20px);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Jazz Vinyl Record */
+        .vinyl-container {
+            width: 240px;
+            height: 240px;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .vinyl {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #111 30%, #222 31%, #111 32%, var(--j-gold) 35%, #000 37%);
+            border-radius: 50%;
+            border: 4px solid #000;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 25px rgba(239, 184, 16, 0.3);
+            animation: spin 8s linear infinite;
+            animation-play-state: paused;
+        }
+        .is-playing .vinyl { animation-play-state: running; }
+        
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Gold Polaroid Frames */
+        .polaroid {
+            background: #fff;
+            padding: 0.8rem 0.8rem 3.5rem 0.8rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transform: rotate(var(--rot));
+            max-width: 85%;
+            border: 1px solid var(--j-gold);
+            position: relative;
+        }
+        .polaroid img {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        /* Gentle White & Pink Envelope Styles */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #ffffff;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 4px;
+        }
+        .envelope-wrapper:hover { transform: scale(1.05); }
+        
+        .envelope-front {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            border: 1px solid rgba(255, 179, 193, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid var(--j-gentle-pink);
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 5;
+        }
+
+        .letter {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            right: 10px;
+            height: 180px;
+            background: #fff;
+            padding: 1.5rem;
+            color: #333;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 6;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            border: 1px solid #fef0f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .envelope-wrapper.open .letter {
+            transform: translateY(-130px);
+            height: 280px;
+        }
+
+        .seal {
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, #ff8fa3, #d90429);
+            border-radius: 50%;
+            position: absolute;
+            top: 88px;
+            left: 128px;
+            z-index: 30;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 0 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, transform 0.3s;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .seal::after {
+            content: "♥";
+            color: white;
+            font-size: 20px;
+        }
+        .envelope-wrapper.open .seal { opacity: 0; pointer-events: none; transform: scale(0.5); }
+
+        /* Jazz Lounge UI Elements */
+        .glass-lounge {
+            background: rgba(136, 13, 30, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--j-gold);
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Neon & Glow */
+        .neon-gold { text-shadow: 0 0 10px var(--j-gold), 0 0 20px rgba(239, 184, 16, 0.4); }
+        .neon-rose { text-shadow: 0 0 10px var(--j-blush), 0 0 20px var(--j-raspberry); }
+
+        #no-btn {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: absolute;
+            white-space: nowrap;
+            background: rgba(255, 143, 163, 0.1);
+            border: 1px solid rgba(255, 143, 163, 0.4);
+            color: var(--j-blush);
+            border-radius: 1rem;
+            padding: 1rem 2rem;
+            font-weight: bold;
+        }
+
+        .affirmation {
+            position: fixed;
+            pointer-events: none;
+            font-family: 'Dancing Script', cursive;
+            z-index: 200;
+            animation: driftUp 2.5s ease-out forwards;
+            white-space: nowrap;
+        }
+        @keyframes driftUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-200px) translateX(var(--drift-x)) scale(1.2); opacity: 0; }
+        }
+
+        .dots-container {
+            position: fixed;
+            bottom: 1.5rem;
+            display: flex;
+            gap: 6px;
+            z-index: 100;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .dot.active {
+            background: var(--j-gold);
+            width: 15px;
+            border-radius: 10px;
+        }
+
+        /* Typewriter Cursor */
+        #typewriter::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body onclick="handleTap(event)">
+
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-[500]"></canvas>
+
+    <div class="dots-container" id="dots-ui"></div>
+
+    <!-- Slide 0: Vinyl Intro -->
+    <div id="slide-0" class="slide active">
+        <div id="record-wrap" class="vinyl-container">
+            <div class="vinyl flex items-center justify-center">
+                <div class="w-20 h-20 bg-black rounded-full border-2 border-[var(--j-gold)] flex items-center justify-center">
+                    <span class="text-amber-400 font-bold text-[9px] text-center uppercase tracking-widest leading-none">My <br> Love <br> Joudy</span>
+                </div>
+            </div>
+            <div class="absolute -right-6 top-0 w-6 h-36 bg-zinc-300 origin-top rotate-12 transition-transform duration-700" id="needle" style="clip-path: polygon(40% 0, 60% 0, 100% 100%, 0% 100%);"></div>
+        </div>
+        <h1 class="text-5xl font-lounge text-amber-100 neon-gold">For Joudy</h1>
+        <p class="mt-4 text-amber-500/80 font-syne text-[10px] tracking-[0.5em] uppercase">Tap to play our song</p>
+    </div>
+
+    <!-- Slide 1: Feelings -->
+    <div id="slide-1" class="slide">
+        <span class="text-6xl mb-6">🌹</span>
+        <h2 class="text-4xl font-romantic text-blush mb-6">Hey Gorgeous,</h2>
+        <div class="glass-lounge p-8 text-center mx-4">
+            <p class="text-xl leading-relaxed text-amber-500 font-serif italic mb-4">
+                "We can make it if we try..."
+            </p>
+            <p class="text-sm text-rose-100 leading-loose">
+                Every beat of my heart follows your melody, Joudy. You are my greatest inspiration.
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Vibe Check -->
+    <div id="slide-2" class="slide" onclick="event.stopPropagation()">
+        <h2 class="text-2xl font-syne uppercase text-gold tracking-widest mb-4">The Pulse</h2>
+        <p class="text-xs text-center px-12 text-rose-200/60 mb-12">Tune into how I feel about you...</p>
+        <div class="w-full px-12">
+            <input type="range" min="0" max="100" value="0" class="w-full h-1 bg-rose-900 rounded-lg appearance-none cursor-pointer accent-gold" id="vibeRange" oninput="updateVibe(this.value)">
+        </div>
+        <div class="text-7xl font-syne text-gold mt-8 neon-gold" id="vibePercent">0%</div>
+        <p id="vibeMsg" class="mt-6 font-romantic text-2xl text-rose-300 opacity-0 transition-opacity">Keep sliding, Joudy...</p>
+    </div>
+
+    <!-- Slides 3-4: Memories (Polaroids) -->
+    <div id="slide-3" class="slide">
+        <div class="polaroid" style="--rot: -2deg">
+            <img src="./WhatsApp Image 2026-02-14 at 4.31.53 PM.jpeg" alt="Memory 1">
+            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Our Connection</p>
+        </div>
+    </div>
+
+    <div id="slide-4" class="slide">
+        <div class="polaroid" style="--rot: 3deg">
+            <img src="./WhatsApp Image 2026-02-14 at 4.30.54 PM.jpeg" alt="Memory 2">
+            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Together</p>
+        </div>
+    </div>
+
+    <!-- Slide 5: VIP Access -->
+    <div id="slide-5" class="slide" onclick="event.stopPropagation()">
+        <h2 class="text-2xl font-syne uppercase text-gold mb-12 tracking-widest">Secret Vault</h2>
+        <div class="w-24 h-24 border-2 border-gold rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(239,184,16,0.4)] relative overflow-hidden" id="fingerprint" onmousedown="startHold()" onmouseup="endHold()" ontouchstart="startHold()" ontouchend="endHold()">
+            <div class="absolute w-full h-1 bg-gold top-0 animate-[scan_2s_linear_infinite]" id="scan-line"></div>
+            <span class="text-4xl">❤️</span>
+        </div>
+        <p class="mt-12 text-[10px] uppercase tracking-[0.3em] text-rose-300 text-center px-16" id="hold-text">
+            Hold your finger here to unlock...
+        </p>
+        <div id="secret-msg" class="mt-8 glass-lounge p-6 opacity-0 transition-all scale-90 mx-6">
+            <p class="font-serif italic text-lg text-center text-amber-100">"You're my peace & my love, Joudy."</p>
+        </div>
+    </div>
+
+    <!-- Slides 6-7: Memories -->
+    <div id="slide-6" class="slide">
+        <div class="polaroid" style="--rot: -1deg">
+            <img src="./WhatsApp Image 2026-02-14 at 4.31.23 PM.jpeg" alt="Memory 3">
+            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Pure Joy.</p>
+        </div>
+    </div>
+
+    <div id="slide-7" class="slide">
+        <div class="polaroid" style="--rot: 2deg">
+            <img src="./WhatsApp Image 2026-02-14 at 4.28.46 PM.jpeg" alt="Memory 4">
+            <p class="font-romantic text-3xl text-rose-900 text-center mt-2">Just The Two Of Us <br>Forever.</p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Heart Bloom -->
+    <div id="slide-8" class="slide" onclick="event.stopPropagation()">
+        <h2 class="text-2xl font-syne uppercase mb-6 text-gold tracking-widest">Heartbeat</h2>
+        <div id="bloom-heart" class="text-[7rem] transition-all duration-300 relative z-10 drop-shadow-[0_0_25px_rgba(251,113,133,0.6)]" onclick="bloom(event)">❤️</div>
+        <p class="mt-20 text-[10px] font-bold uppercase tracking-[0.4em] text-rose-300 italic text-center px-16" id="bloom-text">
+            Tap to feel my heart expand...
+        </p>
+    </div>
+
+    <!-- Slide 9: The Question -->
+    <div id="slide-9" class="slide" onclick="event.stopPropagation()">
+        <div class="glass-lounge p-12 w-full flex flex-col items-center relative border-rose-500/30">
+            <h2 class="text-5xl font-romantic text-blush mb-10 text-center">Be My Valentine, Joudy?</h2>
+            <div class="w-full flex flex-col gap-6 relative min-h-[220px] justify-center items-center">
+                <button onclick="accept()" class="w-full bg-rose-600 py-6 rounded-2xl font-bold text-3xl text-white shadow-[0_10px_40px_rgba(217,4,41,0.4)] border border-rose-400 active:scale-95 transition-transform z-10">
+                    YES! ❤️
+                </button>
+                <div class="relative w-full h-20 flex items-center justify-center">
+                    <button id="no-btn" onmouseover="dodge(event)" onclick="dodge(event)" ontouchstart="dodge(event)" class="w-full py-5 rounded-2xl font-bold text-xl">
+                        No
+                    </button>
+                </div>
+            </div>
+            <p id="no-msg" class="mt-4 text-[10px] font-bold text-gold opacity-0 transition-opacity uppercase tracking-widest">Only 'Yes' is the right note! ❤️</p>
+        </div>
+    </div>
+
+    <!-- Slide 10: Message Envelope with Typewriter -->
+    <div id="slide-10" class="slide" onclick="event.stopPropagation()">
+        <h2 class="text-2xl font-syne uppercase text-amber-100 tracking-widest mb-12 neon-gold">A Special Note</h2>
+        <div class="envelope-wrapper" id="envelope" onclick="openEnvelope()">
+            <div class="flap"></div>
+            <div class="letter">
+                <div id="typewriter" class="flex flex-col h-full overflow-hidden">
+                    <!-- Text will be typed here -->
+                </div>
+            </div>
+            <div class="envelope-front">
+                <div class="seal"></div>
+            </div>
+        </div>
+        <p class="mt-40 text-[10px] text-amber-200/60 uppercase tracking-widest" id="env-hint">Tap the heart seal to open...</p>
+    </div>
+
+    <!-- Slide 11: Finale -->
+    <div id="slide-11" class="slide" style="background: radial-gradient(circle, #880d1e 0%, #2d0611 100%) !important;" onclick="spawnNote(event)">
+        <div class="jazz-banner font-syne uppercase text-[10px] tracking-widest">
+            ENCORE FOR JOUDY • JUST THE TWO OF US • MY EVERYTHING • FOREVER JOUDY • ETERNAL VALENTINE • 
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center">
+            <div class="text-9xl mb-8 neon-gold">✨</div>
+            <h2 class="text-7xl font-romantic text-rose-300 mb-4 neon-rose">It's Us.</h2>
+            <p class="text-sm font-syne uppercase tracking-[0.5em] mb-12 text-amber-200/60">I love you babe : MY QUEEN JOUDY</p>
+            
+            <div class="vinyl-container scale-90 is-playing">
+                <div class="vinyl">
+                    <div class="absolute inset-0 flex items-center justify-center font-syne text-[8px] leading-tight text-center text-amber-400">OUR <br> LOVE <br> BEGINS</div>
+                </div>
+            </div>
+            
+            <p class="mt-16 text-[10px] uppercase tracking-widest text-gold italic opacity-60">Tap for a special harmony...</p>
+        </div>
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source src="./Grover_Washington_-_Just_The_Two_Of_Us_Ft._Bill_Withers_(mp3.pm).mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 12; 
+        let bloomLevel = 1;
+        let bloomCount = 0;
+        let holdTimer;
+        let holdDone = false;
+        let playing = false;
+        let envelopeOpened = false;
+        let typingStarted = false;
+
+        const jazzAffirmations = [
+            "Your Kindness", "Our Connection", "Midnight Thoughts", "That Perfect Smile", "Always You", "My Soulmate", "Golden Love", "Infinite Joy"
+        ];
+
+        // Init Dots UI
+        const dotsBox = document.getElementById('dots-ui');
+        for(let i=0; i<totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = `dot ${i === 0 ? 'active' : ''}`;
+            dotsBox.appendChild(dot);
+        }
+
+        function handleTap(e) {
+            if ([0, 2, 5, 8, 9, 10, 11].includes(currentSlide)) return;
+            nextSlide();
+        }
+
+        function nextSlide() {
+            if (currentSlide >= totalSlides - 1) return;
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            currentSlide++;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            updateDots();
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
+
+        // Slide 0: Start
+        document.getElementById('slide-0').addEventListener('click', () => {
+            if (currentSlide !== 0) return;
+            const needle = document.getElementById('needle');
+            const audio = document.getElementById('bg-audio');
+            needle.style.transform = 'rotate(28deg)';
+            document.getElementById('slide-0').classList.add('is-playing');
+            setTimeout(() => {
+                audio.play();
+                playing = true;
+                nextSlide();
+            }, 800);
+        });
+
+        function updateVibe(val) {
+            const display = document.getElementById('vibePercent');
+            const msg = document.getElementById('vibeMsg');
+            display.innerText = val + '%';
+            if(val > 0) msg.style.opacity = '1';
+            if(val == 100) {
+                display.innerText = '∞%';
+                msg.innerText = 'Perfect harmony!';
+                setTimeout(nextSlide, 1500);
+            }
+        }
+
+        function startHold() {
+            if(holdDone) return;
+            const area = document.getElementById('fingerprint');
+            area.style.transform = 'scale(0.9)';
+            holdTimer = setTimeout(() => {
+                document.getElementById('secret-msg').style.opacity = '1';
+                document.getElementById('secret-msg').style.transform = 'scale(1)';
+                document.getElementById('hold-text').innerText = 'Access Granted. Tap to enter.';
+                holdDone = true;
+                area.innerHTML = '<span class="text-4xl">👑</span>';
+                area.style.borderColor = '#fbbf24';
+                setTimeout(nextSlide, 2500);
+            }, 2000);
+        }
+        function endHold() {
+            if(holdDone) return;
+            clearTimeout(holdTimer);
+            document.getElementById('fingerprint').style.transform = 'scale(1)';
+        }
+
+        function bloom(e) {
+            const heart = document.getElementById('bloom-heart');
+            const text = document.getElementById('bloom-text');
+            bloomLevel += 0.5;
+            bloomCount++;
+            heart.style.transform = `scale(${bloomLevel})`;
+            
+            const note = document.createElement('div');
+            note.className = 'affirmation text-rose-300 neon-rose';
+            note.innerText = jazzAffirmations[bloomCount % jazzAffirmations.length];
+            note.style.left = (e.clientX || window.innerWidth / 2) - 50 + 'px';
+            note.style.top = (e.clientY || window.innerHeight / 2) + 'px';
+            note.style.setProperty('--drift-x', (Math.random() * 140 - 70) + 'px');
+            document.body.appendChild(note);
+            setTimeout(() => note.remove(), 2500);
+
+            if (bloomLevel > 5) {
+                heart.style.opacity = '0';
+                setTimeout(nextSlide, 800);
+            } else {
+                text.innerText = `"${jazzAffirmations[bloomCount % jazzAffirmations.length]}..."`;
+            }
+        }
+
+        const noBtn = document.getElementById('no-btn');
+        const vMsgs = ["Nice try! ❤️", "Missed me! ✨", "Red is the color! 🌹", "Wrong chord! 🎷"];
+        function dodge(e) {
+            e.preventDefault();
+            const pad = 100;
+            const x = Math.max(pad/2, Math.random() * (window.innerWidth - noBtn.offsetWidth - pad));
+            const y = Math.max(pad/2, Math.random() * (window.innerHeight - noBtn.offsetHeight - pad));
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+            noBtn.innerText = vMsgs[Math.floor(Math.random() * vMsgs.length)];
+            document.getElementById('no-msg').style.opacity = '1';
+        }
+
+        function accept() {
+            nextSlide();
+        }
+
+        function openEnvelope() {
+            if (envelopeOpened) {
+                nextSlide();
+                startConfetti();
+                return;
+            }
+            const env = document.getElementById('envelope');
+            const hint = document.getElementById('env-hint');
+            env.classList.add('open');
+            envelopeOpened = true;
+            hint.innerText = "Tap again once you've read our note...";
+
+            // Wait for letter to slide out before starting typewriter (animation is 0.8s)
+            setTimeout(startTypewriter, 1000);
+        }
+
+        function startTypewriter() {
+            if (typingStarted) return;
+            typingStarted = true;
+            
+            const container = document.getElementById('typewriter');
+            
+            const content = [
+                { text: "My Love Joudy,", class: "font-romantic text-2xl text-rose-900 leading-tight mb-2" },
+                { text: "You make every day feel like a beautiful symphony. I am so lucky to have you in my life. Every smile, every laugh, and every moment we share is a memory I'll cherish forever. Happy Valentine's Day!", class: "text-[15px] text-gray-700 leading-relaxed font-medium mb-4" },
+                { text: "Forever Yours ❤️", class: "text-[15px] font-romantic text-xl text-rose-800 text-right " }
+            ];
+
+            let lineIndex = 0;
+            let charIndex = 0;
+
+            function type() {
+                if (lineIndex < content.length) {
+                    const line = content[lineIndex];
+                    
+                    // Create element if starting new line
+                    if (charIndex === 0) {
+                        const el = document.createElement('p');
+                        el.className = line.class;
+                        el.id = `type-line-${lineIndex}`;
+                        container.appendChild(el);
+                    }
+
+                    const target = document.getElementById(`type-line-${lineIndex}`);
+                    target.textContent += line.text[charIndex];
+                    charIndex++;
+
+                    if (charIndex < line.text.length) {
+                        setTimeout(type, 30);
+                    } else {
+                        charIndex = 0;
+                        lineIndex++;
+                        setTimeout(type, 500); // Pause between paragraphs
+                    }
+                }
+            }
+
+            type();
+        }
+
+        function spawnNote(e) {
+            const note = document.createElement('div');
+            note.className = 'affirmation text-amber-200';
+            note.innerHTML = ['🎷', '🎹', '🎶', '✨', '❤️'][Math.floor(Math.random()*5)];
+            note.style.left = e.clientX + 'px';
+            note.style.top = e.clientY + 'px';
+            note.style.setProperty('--drift-x', (Math.random() * 200 - 100) + 'px');
+            document.body.appendChild(note);
+            setTimeout(() => note.remove(), 2000);
+        }
+
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let pieces = [];
+        function startConfetti() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<150; i++) pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                s: Math.random() * 10 + 4,
+                c: ['#efb810', '#d90429', '#ffffff', '#ff8fa3'][Math.floor(Math.random()*4)],
+                v: Math.random() * 4 + 2
+            });
+            updateConfetti();
+        }
+        function updateConfetti() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            pieces.forEach(p => {
+                p.y += p.v;
+                ctx.fillStyle = p.c;
+                ctx.fillRect(p.x, p.y, p.s, p.s);
+                if(p.y > canvas.height) p.y = -30;
+            });
+            if(currentSlide === 11) requestAnimationFrame(updateConfetti);
+        }
+    </script>
+</body>
+</html>
